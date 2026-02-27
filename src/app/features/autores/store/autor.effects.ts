@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AutorService } from '../../../core/services/autor.service';
 import * as AutorActions from './autor.actions';
 
@@ -10,11 +10,12 @@ import * as AutorActions from './autor.actions';
 export class AutorEffects {
   readonly loadAutores$;
   readonly createAutor$;
+  readonly navigateAfterCreateSuccess$;
 
   constructor(
     private actions$: Actions,
     private autorService: AutorService,
-    private store: Store
+    private router: Router
   ) {
     this.loadAutores$ = createEffect(() =>
       this.actions$.pipe(
@@ -38,6 +39,17 @@ export class AutorEffects {
           )
         )
       )
+    );
+
+    this.navigateAfterCreateSuccess$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(AutorActions.createAutorSuccess),
+          tap(() => {
+            void this.router.navigate(['/autores']);
+          })
+        ),
+      { dispatch: false }
     );
   }
 }

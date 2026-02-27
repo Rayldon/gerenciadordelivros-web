@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as AutorActions from '../store/autor.actions';
@@ -7,12 +8,11 @@ import {
   selectAllAutores,
   selectAutorLoading,
 } from '../store/autor.selectors';
-import { AutorFormComponent } from './autor-form.component';
 
 @Component({
   selector: 'app-autor-list',
   standalone: true,
-  imports: [CommonModule, AutorFormComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './autor-list.component.html',
 })
 export class AutorListComponent implements OnInit {
