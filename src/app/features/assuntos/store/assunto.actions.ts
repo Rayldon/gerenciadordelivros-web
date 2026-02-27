@@ -29,4 +29,36 @@ export const createAssuntoError = createAction(
   props<{ error: ApiError }>()
 );
 
+export const updateAssunto = createAction(
+  '[Assunto] Update Assunto',
+  props<{ id: number; assunto: Assunto }>()
+);
+
+export const updateAssuntoSuccess = createAction(
+  '[Assunto] Update Assunto Success',
+  props<{ id: number; assunto: Assunto }>()
+);
+
+export const updateAssuntoError = createAction(
+  '[Assunto] Update Assunto Error',
+  props<{ error: ApiError }>()
+);
+
+export const deleteAssunto = createAction(
+  '[Assunto] Delete Assunto',
+  props<{ id: number }>()
+);
+
+export const deleteAssuntoSuccess = createAction(
+  '[Assunto] Delete Assunto Success',
+  props<{ id: number }>()
+);
+
+export const deleteAssuntoError = createAction(
+  '[Assunto] Delete Assunto Error',
+  props<{ error: ApiError }>()
+);
+
+export const clearSuccess = createAction('[Assunto] Clear Success');
+
 export const clearError = createAction('[Assunto] Clear Error');

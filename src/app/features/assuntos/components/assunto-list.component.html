@@ -6,7 +6,50 @@
       <h2 class="mb-0">Assuntos Cadastrados</h2>
       <a class="btn btn-primary" routerLink="/assuntos/novo">Incluir Assunto</a>
     </div>
+
+    @if (success$ | async; as success) {
+      <div class="col-12">
+        <div class="alert alert-success alert-dismissible fade show">
+          {{ success }}
+          <button type="button" class="btn-close" (click)="clearFeedback()"></button>
+        </div>
+      </div>
+    }
+
+    @if (error$ | async; as error) {
+      <div class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show">
+          {{ toFriendlyError(error) }}
+          <button type="button" class="btn-close" (click)="clearFeedback()"></button>
+        </div>
+      </div>
+    }
+
     <div class="col-12">
+      @if (editingId !== null) {
+        <div class="card mb-3">
+          <div class="card-header">Editar Assunto</div>
+          <div class="card-body">
+            <form [formGroup]="editForm" (ngSubmit)="saveEdit()">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-8">
+                  <label class="form-label">Descricao</label>
+                  <input class="form-control" formControlName="descricao" />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                  <button type="submit" class="btn btn-success" [disabled]="(loading$ | async) || editForm.invalid">
+                    Salvar
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+
       @if (loading$ | async) {
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Carregando...</span>
@@ -14,20 +57,39 @@
       } @else {
         @if (assuntos$ | async; as assuntos) {
           @if (assuntos.length > 0) {
-            <table class="table table-striped table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Descrição</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (assunto of assuntos; track assunto.descricao) {
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
                   <tr>
-                    <td>{{ assunto.descricao }}</td>
+                    <th>Descricao</th>
+                    <th class="text-end">Acoes</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (assunto of assuntos; track $index) {
+                    <tr>
+                      <td>{{ assunto.descricao }}</td>
+                      <td class="text-end">
+                        <button
+                          class="btn btn-sm btn-outline-primary me-2"
+                          type="button"
+                          [disabled]="loading$ | async"
+                          (click)="startEdit(assunto)">
+                          Editar
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline-danger"
+                          type="button"
+                          [disabled]="loading$ | async"
+                          (click)="deleteAssunto(assunto)">
+                          Excluir
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           } @else {
             <div class="alert alert-info">Nenhum assunto cadastrado.</div>
           }

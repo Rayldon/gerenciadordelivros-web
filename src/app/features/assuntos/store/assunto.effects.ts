@@ -10,6 +10,9 @@ import * as AssuntoActions from './assunto.actions';
 export class AssuntoEffects {
   readonly loadAssuntos$;
   readonly createAssunto$;
+  readonly updateAssunto$;
+  readonly deleteAssunto$;
+  readonly reloadAfterMutationSuccess$;
   readonly navigateAfterCreateSuccess$;
 
   constructor(
@@ -38,6 +41,41 @@ export class AssuntoEffects {
             catchError((error) => of(AssuntoActions.createAssuntoError({ error })))
           )
         )
+      )
+    );
+
+    this.updateAssunto$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AssuntoActions.updateAssunto),
+        switchMap(({ id, assunto }) =>
+          this.assuntoService.updateAssunto(id, assunto).pipe(
+            map((updatedAssunto) => AssuntoActions.updateAssuntoSuccess({ id, assunto: updatedAssunto })),
+            catchError((error) => of(AssuntoActions.updateAssuntoError({ error })))
+          )
+        )
+      )
+    );
+
+    this.deleteAssunto$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AssuntoActions.deleteAssunto),
+        switchMap(({ id }) =>
+          this.assuntoService.deleteAssunto(id).pipe(
+            map(() => AssuntoActions.deleteAssuntoSuccess({ id })),
+            catchError((error) => of(AssuntoActions.deleteAssuntoError({ error })))
+          )
+        )
+      )
+    );
+
+    this.reloadAfterMutationSuccess$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(
+          AssuntoActions.createAssuntoSuccess,
+          AssuntoActions.updateAssuntoSuccess,
+          AssuntoActions.deleteAssuntoSuccess
+        ),
+        map(() => AssuntoActions.loadAssuntos())
       )
     );
 

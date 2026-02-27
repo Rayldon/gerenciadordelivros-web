@@ -19,4 +19,12 @@ export class AssuntoService {
   createAssunto(assunto: Assunto): Observable<Assunto> {
     return this.http.post<Assunto>(this.apiUrl, assunto);
   }
+
+  updateAssunto(id: number, assunto: Assunto): Observable<Assunto> {
+    return this.http.put<Assunto>(`${this.apiUrl}/${id}`, assunto);
+  }
+
+  deleteAssunto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
