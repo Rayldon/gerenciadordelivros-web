@@ -2,6 +2,12 @@
 
 Frontend Angular para gerenciamento de livros, autores e assuntos.
 
+## Backend
+
+Repositorio do backend:
+
+- https://github.com/Rayldon/gerenciadordelivros
+
 ## Setup
 
 ```bash
@@ -9,17 +15,18 @@ npm install
 npm start
 ```
 
-Abre em `http://localhost:4200`
+Abre em `http://localhost:4200`.
 
 ## O que tem
 
-A aplicação é bem simples. Três seções:
+A aplicacao possui as secoes:
 
-- **Livros**: Lista e criação de livros. Cada livro precisa de título, valor, pelo menos um autor e um assunto. Usa FormArray pra gerenciar os arrays dinamicamente.
-- **Autores**: Lista e criação com nome.
-- **Assuntos**: Lista e criação com descrição.
+- **Livros**: listagem paginada, criacao, edicao e exclusao.
+- **Autores**: listagem, criacao, edicao e exclusao.
+- **Assuntos**: listagem, criacao, edicao e exclusao.
+- **Relatorio**: exportacao PDF de autores.
 
-Tudo usa Reactive Forms com validações e a interface é Bootstrap.
+Tudo usa Reactive Forms com validacoes e interface Bootstrap.
 
 ## Tech Stack
 
@@ -32,30 +39,53 @@ Tudo usa Reactive Forms com validações e a interface é Bootstrap.
 
 ## Estrutura
 
-```
+```text
 src/app/
-├── core/
-│   ├── models/      # Interfaces
-│   ├── services/    # HTTP
-│   └── interceptors/  # Error handling
-├── features/
-│   ├── livros/
-│   ├── autores/
-│   └── assuntos/
-└── environments/
+|-- core/
+|   |-- models/        # Interfaces
+|   |-- services/      # HTTP
+|   |-- interceptors/  # Error handling
+|   `-- utils/
+|-- features/
+|   |-- livros/
+|   |-- autores/
+|   |-- assuntos/
+|   `-- relatorios/
+`-- environments/
 ```
 
 Cada feature tem seus componentes e store NgRx com actions, reducers, selectors e effects.
 
 ## API
 
-Por padrão chamada em `http://localhost:8080`. Os endpoints esperados:
+Por padrao chamada em `http://localhost:8080`. Endpoints usados pelo frontend:
 
-- `GET /livros`, `POST /livros`
-- `GET /autores`, `POST /autores`
-- `GET /assuntos`, `POST /assuntos`
+### Livros
 
-Pra mudar a URL, edita `src/app/environments/environment.ts`
+- `GET /livros?page=0&size=10`
+- `POST /livros`
+- `PUT /livros/{id}`
+- `DELETE /livros/{id}`
+
+### Autores
+
+- `GET /autores`
+- `POST /autores`
+- `PUT /autores/{id}`
+- `DELETE /autores/{id}`
+
+### Assuntos
+
+- `GET /assuntos`
+- `POST /assuntos`
+- `PUT /assuntos/{id}`
+- `DELETE /assuntos/{id}`
+
+### Relatorios
+
+- `GET /relatorios/autores` (PDF)
+
+Para mudar a URL da API, edite `src/app/environments/environment.ts`.
 
 ## Build
 
@@ -63,10 +93,10 @@ Pra mudar a URL, edita `src/app/environments/environment.ts`
 npm run build
 ```
 
-## Validações
+## Validacoes
 
-- Livro: título e valor obrigatórios, mínimo 1 autor e 1 assunto
-- Autor: nome obrigatório
-- Assunto: descrição obrigatória
+- Livro: titulo e valor obrigatorios, minimo 1 autor e 1 assunto
+- Autor: nome obrigatorio
+- Assunto: descricao obrigatoria
 
-Erros da API são exibidos em alerts na tela.
+Erros da API sao exibidos em alerts na tela.
