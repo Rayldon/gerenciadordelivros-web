@@ -1,0 +1,136 @@
+<div class="card">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">Criar Novo Livro</h5>
+  </div>
+  <div class="card-body">
+    @if (error$ | async) {
+      <div class="alert alert-danger alert-dismissible fade show">
+        {{ (error$ | async)?.message }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="clearError()"></button>
+      </div>
+    }
+
+    <form [formGroup]="livroForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="titulo" class="form-label">Título *</label>
+        <input
+          type="text"
+          class="form-control"
+          id="titulo"
+          formControlName="titulo"
+          [class.is-invalid]="isTituloInvalid()" />
+        @if (isTituloInvalid()) {
+          <div class="invalid-feedback">
+            Título é obrigatório e não pode estar vazio
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="valor" class="form-label">Valor (R$) *</label>
+        <input
+          type="number"
+          class="form-control"
+          id="valor"
+          formControlName="valor"
+          step="0.01"
+          [class.is-invalid]="isValorInvalid()" />
+        @if (isValorInvalid()) {
+          <div class="invalid-feedback">
+            Valor é obrigatório e deve ser >= 0
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Autores *</label>
+        <div formArrayName="autores">
+          @for (
+            autorControl of autoresArray;
+            let i = $index;
+            track i
+          ) {
+            <div class="input-group mb-2">
+              <input
+                type="text"
+                class="form-control"
+                [formControl]="autorControl" />
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="removeAutor(i)">
+                Remover
+              </button>
+            </div>
+          }
+        </div>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary mb-3"
+          (click)="addAutor()">
+          + Adicionar Autor
+        </button>
+        @if (isAutoresInvalid()) {
+          <div class="text-danger">
+            <small>Deve haver pelo menos 1 autor</small>
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Assuntos *</label>
+        <div formArrayName="assuntos">
+          @for (
+            assuntoControl of assuntosArray;
+            let i = $index;
+            track i
+          ) {
+            <div class="input-group mb-2">
+              <input
+                type="text"
+                class="form-control"
+                [formControl]="assuntoControl" />
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="removeAssunto(i)">
+                Remover
+              </button>
+            </div>
+          }
+        </div>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary mb-3"
+          (click)="addAssunto()">
+          + Adicionar Assunto
+        </button>
+        @if (isAssuntosInvalid()) {
+          <div class="text-danger">
+            <small>Deve haver pelo menos 1 assunto</small>
+          </div>
+        }
+      </div>
+
+      <div class="d-grid">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="!livroForm.valid || (loading$ | async)">
+          @if (loading$ | async) {
+            <span
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"></span>
+            Salvando...
+          } @else {
+            Salvar Livro
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
