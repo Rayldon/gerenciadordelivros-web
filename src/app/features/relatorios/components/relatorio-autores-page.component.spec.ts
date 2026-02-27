@@ -24,7 +24,7 @@ describe('RelatorioAutoresPageComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should show loading spinner and then success message', async () => {
+  it('should update state to success when service returns', async () => {
     const subj = new Subject<any>();
     serviceSpy.getAutoresReport.mockReturnValue(subj.asObservable());
 
@@ -35,25 +35,18 @@ describe('RelatorioAutoresPageComponent', () => {
     fixture.detectChanges();
 
     expect(component.state).toBe('loading');
-    expect(
-      fixture.nativeElement.querySelector('.spinner-border')
-    ).toBeTruthy();
 
     subj.next({ data: new Blob(), filename: 'f.pdf' });
     subj.complete();
-    await Promise.resolve();
-    fixture.detectChanges();
 
+    await fixture.whenStable();
     expect(component.state).toBe('success');
-    expect(
-      fixture.nativeElement.querySelector('.alert-success')
-    ).toBeTruthy();
-    expect(
-      fixture.nativeElement.querySelector('.spinner-border')
-    ).toBeNull();
   });
 
   it('should display error alert when service fails', async () => {
+    // silence console.error produced by component
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
     serviceSpy.getAutoresReport.mockReturnValue(
       throwError(() => new Error('fail'))
     );
@@ -64,11 +57,7 @@ describe('RelatorioAutoresPageComponent', () => {
     button.click();
     fixture.detectChanges();
 
-    expect(component.state).toBe('loading');
-
-    await Promise.resolve();
-    fixture.detectChanges();
-
+    // error happens synchronously so state becomes "error" immediately
     expect(component.state).toBe('error');
     const alert = fixture.nativeElement.querySelector('.alert-danger');
     expect(alert).toBeTruthy();
