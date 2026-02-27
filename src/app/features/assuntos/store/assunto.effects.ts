@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AssuntoService } from '../../../core/services/assunto.service';
 import * as AssuntoActions from './assunto.actions';
 
@@ -10,11 +10,12 @@ import * as AssuntoActions from './assunto.actions';
 export class AssuntoEffects {
   readonly loadAssuntos$;
   readonly createAssunto$;
+  readonly navigateAfterCreateSuccess$;
 
   constructor(
     private actions$: Actions,
     private assuntoService: AssuntoService,
-    private store: Store
+    private router: Router
   ) {
     this.loadAssuntos$ = createEffect(() =>
       this.actions$.pipe(
@@ -38,6 +39,17 @@ export class AssuntoEffects {
           )
         )
       )
+    );
+
+    this.navigateAfterCreateSuccess$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(AssuntoActions.createAssuntoSuccess),
+          tap(() => {
+            void this.router.navigate(['/assuntos']);
+          })
+        ),
+      { dispatch: false }
     );
   }
 }

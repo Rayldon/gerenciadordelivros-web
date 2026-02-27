@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as AssuntoActions from '../store/assunto.actions';
@@ -7,12 +8,11 @@ import {
   selectAllAssuntos,
   selectAssuntoLoading,
 } from '../store/assunto.selectors';
-import { AssuntoFormComponent } from './assunto-form.component';
 
 @Component({
   selector: 'app-assunto-list',
   standalone: true,
-  imports: [CommonModule, AssuntoFormComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './assunto-list.component.html',
 })
 export class AssuntoListComponent implements OnInit {
