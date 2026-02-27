@@ -29,4 +29,36 @@ export const createAutorError = createAction(
   props<{ error: ApiError }>()
 );
 
+export const updateAutor = createAction(
+  '[Autor] Update Autor',
+  props<{ id: number; autor: Autor }>()
+);
+
+export const updateAutorSuccess = createAction(
+  '[Autor] Update Autor Success',
+  props<{ id: number; autor: Autor }>()
+);
+
+export const updateAutorError = createAction(
+  '[Autor] Update Autor Error',
+  props<{ error: ApiError }>()
+);
+
+export const deleteAutor = createAction(
+  '[Autor] Delete Autor',
+  props<{ id: number }>()
+);
+
+export const deleteAutorSuccess = createAction(
+  '[Autor] Delete Autor Success',
+  props<{ id: number }>()
+);
+
+export const deleteAutorError = createAction(
+  '[Autor] Delete Autor Error',
+  props<{ error: ApiError }>()
+);
+
+export const clearSuccess = createAction('[Autor] Clear Success');
+
 export const clearError = createAction('[Autor] Clear Error');

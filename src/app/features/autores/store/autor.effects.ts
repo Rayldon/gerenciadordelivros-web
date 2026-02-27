@@ -10,6 +10,9 @@ import * as AutorActions from './autor.actions';
 export class AutorEffects {
   readonly loadAutores$;
   readonly createAutor$;
+  readonly updateAutor$;
+  readonly deleteAutor$;
+  readonly reloadAfterMutationSuccess$;
   readonly navigateAfterCreateSuccess$;
 
   constructor(
@@ -38,6 +41,41 @@ export class AutorEffects {
             catchError((error) => of(AutorActions.createAutorError({ error })))
           )
         )
+      )
+    );
+
+    this.updateAutor$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AutorActions.updateAutor),
+        switchMap(({ id, autor }) =>
+          this.autorService.updateAutor(id, autor).pipe(
+            map((updatedAutor) => AutorActions.updateAutorSuccess({ id, autor: updatedAutor })),
+            catchError((error) => of(AutorActions.updateAutorError({ error })))
+          )
+        )
+      )
+    );
+
+    this.deleteAutor$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AutorActions.deleteAutor),
+        switchMap(({ id }) =>
+          this.autorService.deleteAutor(id).pipe(
+            map(() => AutorActions.deleteAutorSuccess({ id })),
+            catchError((error) => of(AutorActions.deleteAutorError({ error })))
+          )
+        )
+      )
+    );
+
+    this.reloadAfterMutationSuccess$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(
+          AutorActions.createAutorSuccess,
+          AutorActions.updateAutorSuccess,
+          AutorActions.deleteAutorSuccess
+        ),
+        map(() => AutorActions.loadAutores())
       )
     );
 

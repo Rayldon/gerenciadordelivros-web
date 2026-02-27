@@ -19,4 +19,12 @@ export class AutorService {
   createAutor(autor: Autor): Observable<Autor> {
     return this.http.post<Autor>(this.apiUrl, autor);
   }
+
+  updateAutor(id: number, autor: Autor): Observable<Autor> {
+    return this.http.put<Autor>(`${this.apiUrl}/${id}`, autor);
+  }
+
+  deleteAutor(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
