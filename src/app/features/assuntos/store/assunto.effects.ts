@@ -8,33 +8,36 @@ import * as AssuntoActions from './assunto.actions';
 
 @Injectable()
 export class AssuntoEffects {
-  loadAssuntos$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AssuntoActions.loadAssuntos),
-      switchMap(() =>
-        this.assuntoService.getAssuntos().pipe(
-          map((assuntos) => AssuntoActions.loadAssuntosSuccess({ assuntos })),
-          catchError((error) => of(AssuntoActions.loadAssuntosError({ error })))
-        )
-      )
-    )
-  );
-
-  createAssunto$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AssuntoActions.createAssunto),
-      switchMap(({ assunto }) =>
-        this.assuntoService.createAssunto(assunto).pipe(
-          map((assunto) => AssuntoActions.createAssuntoSuccess({ assunto })),
-          catchError((error) => of(AssuntoActions.createAssuntoError({ error })))
-        )
-      )
-    )
-  );
+  readonly loadAssuntos$;
+  readonly createAssunto$;
 
   constructor(
     private actions$: Actions,
     private assuntoService: AssuntoService,
     private store: Store
-  ) {}
+  ) {
+    this.loadAssuntos$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AssuntoActions.loadAssuntos),
+        switchMap(() =>
+          this.assuntoService.getAssuntos().pipe(
+            map((assuntos) => AssuntoActions.loadAssuntosSuccess({ assuntos })),
+            catchError((error) => of(AssuntoActions.loadAssuntosError({ error })))
+          )
+        )
+      )
+    );
+
+    this.createAssunto$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AssuntoActions.createAssunto),
+        switchMap(({ assunto }) =>
+          this.assuntoService.createAssunto(assunto).pipe(
+            map((assunto) => AssuntoActions.createAssuntoSuccess({ assunto })),
+            catchError((error) => of(AssuntoActions.createAssuntoError({ error })))
+          )
+        )
+      )
+    );
+  }
 }

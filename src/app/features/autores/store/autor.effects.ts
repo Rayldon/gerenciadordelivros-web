@@ -8,33 +8,36 @@ import * as AutorActions from './autor.actions';
 
 @Injectable()
 export class AutorEffects {
-  loadAutores$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AutorActions.loadAutores),
-      switchMap(() =>
-        this.autorService.getAutores().pipe(
-          map((autores) => AutorActions.loadAutoresSuccess({ autores })),
-          catchError((error) => of(AutorActions.loadAutoresError({ error })))
-        )
-      )
-    )
-  );
-
-  createAutor$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AutorActions.createAutor),
-      switchMap(({ autor }) =>
-        this.autorService.createAutor(autor).pipe(
-          map((autor) => AutorActions.createAutorSuccess({ autor })),
-          catchError((error) => of(AutorActions.createAutorError({ error })))
-        )
-      )
-    )
-  );
+  readonly loadAutores$;
+  readonly createAutor$;
 
   constructor(
     private actions$: Actions,
     private autorService: AutorService,
     private store: Store
-  ) {}
+  ) {
+    this.loadAutores$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AutorActions.loadAutores),
+        switchMap(() =>
+          this.autorService.getAutores().pipe(
+            map((autores) => AutorActions.loadAutoresSuccess({ autores })),
+            catchError((error) => of(AutorActions.loadAutoresError({ error })))
+          )
+        )
+      )
+    );
+
+    this.createAutor$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(AutorActions.createAutor),
+        switchMap(({ autor }) =>
+          this.autorService.createAutor(autor).pipe(
+            map((autor) => AutorActions.createAutorSuccess({ autor })),
+            catchError((error) => of(AutorActions.createAutorError({ error })))
+          )
+        )
+      )
+    );
+  }
 }
