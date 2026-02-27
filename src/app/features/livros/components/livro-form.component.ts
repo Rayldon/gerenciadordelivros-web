@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -6,11 +6,14 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as LivroActions from '../store/livro.actions';
 import { selectLivroError, selectLivroLoading } from '../store/livro.selectors';
 import { Livro } from '../../../core/models';
+import { AutorService } from '../../../core/services/autor.service';
+import { AssuntoService } from '../../../core/services/assunto.service';
 
 @Component({
   selector: 'app-livro-form',
@@ -18,55 +21,33 @@ import { Livro } from '../../../core/models';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './livro-form.component.html',
 })
-export class LivroFormComponent {
+export class LivroFormComponent implements OnInit {
   livroForm!: FormGroup;
   loading$!: Observable<boolean>;
   error$!: Observable<any>;
+  autoresDisponiveis: string[] = [];
+  assuntosDisponiveis: string[] = [];
+  comboLoadError: string | null = null;
+  loadingCombos = false;
 
   constructor(
     private fb: FormBuilder,
-    private store: Store
+    private store: Store,
+    private autorService: AutorService,
+    private assuntoService: AssuntoService
   ) {
     this.livroForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(1)]],
       valor: ['', [Validators.required]],
-      autores: this.fb.array([this.fb.control('')]),
-      assuntos: this.fb.array([this.fb.control('')]),
+      autores: [[], [Validators.required]],
+      assuntos: [[], [Validators.required]],
     });
     this.loading$ = this.store.select(selectLivroLoading);
     this.error$ = this.store.select(selectLivroError);
   }
 
-  get autoresArray() {
-    return (this.livroForm.get('autores') as any).controls;
-  }
-
-  get assuntosArray() {
-    return (this.livroForm.get('assuntos') as any).controls;
-  }
-
-  addAutor(): void {
-    const autoresArray = this.livroForm.get('autores') as any;
-    autoresArray.push(this.fb.control(''));
-  }
-
-  removeAutor(index: number): void {
-    const autoresArray = this.livroForm.get('autores') as any;
-    if (autoresArray.length > 1) {
-      autoresArray.removeAt(index);
-    }
-  }
-
-  addAssunto(): void {
-    const assuntosArray = this.livroForm.get('assuntos') as any;
-    assuntosArray.push(this.fb.control(''));
-  }
-
-  removeAssunto(index: number): void {
-    const assuntosArray = this.livroForm.get('assuntos') as any;
-    if (assuntosArray.length > 1) {
-      assuntosArray.removeAt(index);
-    }
+  ngOnInit(): void {
+    this.loadCombos();
   }
 
   isTituloInvalid(): boolean {
@@ -81,31 +62,28 @@ export class LivroFormComponent {
   }
 
   isAutoresInvalid(): boolean {
-    const autoresArray = this.livroForm.get('autores') as any;
-    const nonEmptyAutores = autoresArray.value.filter(
-      (a: string) => a && a.trim()
-    );
-    return nonEmptyAutores.length === 0;
+    const control = this.livroForm.get('autores');
+    const values = (control?.value as string[] | null) ?? [];
+    return !!(control && control.touched && values.length === 0);
   }
 
   isAssuntosInvalid(): boolean {
-    const assuntosArray = this.livroForm.get('assuntos') as any;
-    const nonEmptyAssuntos = assuntosArray.value.filter(
-      (a: string) => a && a.trim()
-    );
-    return nonEmptyAssuntos.length === 0;
+    const control = this.livroForm.get('assuntos');
+    const values = (control?.value as string[] | null) ?? [];
+    return !!(control && control.touched && values.length === 0);
   }
 
   onSubmit(): void {
-    if (!this.livroForm.valid) return;
+    if (!this.livroForm.valid) {
+      this.livroForm.markAllAsTouched();
+      return;
+    }
     const valor = this.parseCurrencyValue(this.livroForm.get('valor')?.value);
     if (valor === null || valor < 0) return;
-
-    const autoresArray = this.livroForm.get('autores') as any;
-    const assuntosArray = this.livroForm.get('assuntos') as any;
-
-    const autores = autoresArray.value.filter((a: string) => a && a.trim());
-    const assuntos = assuntosArray.value.filter((a: string) => a && a.trim());
+    const autores = ((this.livroForm.get('autores')?.value as string[]) ?? [])
+      .filter((a) => a && a.trim());
+    const assuntos = ((this.livroForm.get('assuntos')?.value as string[]) ?? [])
+      .filter((a) => a && a.trim());
 
     if (autores.length === 0 || assuntos.length === 0) return;
 
@@ -120,8 +98,8 @@ export class LivroFormComponent {
     this.livroForm.reset({
       titulo: '',
       valor: '',
-      autores: [''],
-      assuntos: [''],
+      autores: [],
+      assuntos: [],
     });
   }
 
@@ -158,5 +136,30 @@ export class LivroFormComponent {
     const parsed = Number(normalized);
 
     return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  private loadCombos(): void {
+    this.loadingCombos = true;
+    this.comboLoadError = null;
+
+    forkJoin({
+      autores: this.autorService.getAutores(),
+      assuntos: this.assuntoService.getAssuntos(),
+    })
+      .pipe(
+        catchError(() => {
+          this.comboLoadError = 'Nao foi possivel carregar autores e assuntos.';
+          return of({ autores: [], assuntos: [] });
+        })
+      )
+      .subscribe(({ autores, assuntos }) => {
+        this.autoresDisponiveis = (autores ?? [])
+          .map((a) => a.nome)
+          .filter((n): n is string => !!n && n.trim().length > 0);
+        this.assuntosDisponiveis = (assuntos ?? [])
+          .map((a) => a.descricao)
+          .filter((d): d is string => !!d && d.trim().length > 0);
+        this.loadingCombos = false;
+      });
   }
 }

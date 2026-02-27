@@ -50,32 +50,18 @@
 
       <div class="mb-3">
         <label class="form-label">Autores *</label>
-        <div formArrayName="autores">
-          @for (
-            autorControl of autoresArray;
-            let i = $index;
-            track i
-          ) {
-            <div class="input-group mb-2">
-              <input
-                type="text"
-                class="form-control"
-                [formControl]="autorControl" />
-              <button
-                type="button"
-                class="btn btn-outline-danger"
-                (click)="removeAutor(i)">
-                Remover
-              </button>
-            </div>
+        <select
+          class="form-select"
+          multiple
+          size="6"
+          formControlName="autores"
+          [class.is-invalid]="isAutoresInvalid()"
+          >
+          @for (autor of autoresDisponiveis; track autor) {
+            <option [value]="autor">{{ autor }}</option>
           }
-        </div>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-primary mb-3"
-          (click)="addAutor()">
-          + Adicionar Autor
-        </button>
+        </select>
+        <small class="text-muted">Segure Ctrl para selecionar mais de um autor.</small>
         @if (isAutoresInvalid()) {
           <div class="text-danger">
             <small>Deve haver pelo menos 1 autor</small>
@@ -85,32 +71,18 @@
 
       <div class="mb-3">
         <label class="form-label">Assuntos *</label>
-        <div formArrayName="assuntos">
-          @for (
-            assuntoControl of assuntosArray;
-            let i = $index;
-            track i
-          ) {
-            <div class="input-group mb-2">
-              <input
-                type="text"
-                class="form-control"
-                [formControl]="assuntoControl" />
-              <button
-                type="button"
-                class="btn btn-outline-danger"
-                (click)="removeAssunto(i)">
-                Remover
-              </button>
-            </div>
+        <select
+          class="form-select"
+          multiple
+          size="6"
+          formControlName="assuntos"
+          [class.is-invalid]="isAssuntosInvalid()"
+          >
+          @for (assunto of assuntosDisponiveis; track assunto) {
+            <option [value]="assunto">{{ assunto }}</option>
           }
-        </div>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-primary mb-3"
-          (click)="addAssunto()">
-          + Adicionar Assunto
-        </button>
+        </select>
+        <small class="text-muted">Segure Ctrl para selecionar mais de um assunto.</small>
         @if (isAssuntosInvalid()) {
           <div class="text-danger">
             <small>Deve haver pelo menos 1 assunto</small>
@@ -118,11 +90,19 @@
         }
       </div>
 
+      @if (loadingCombos) {
+        <div class="alert alert-secondary">Carregando autores e assuntos...</div>
+      }
+
+      @if (comboLoadError) {
+        <div class="alert alert-warning">{{ comboLoadError }}</div>
+      }
+
       <div class="d-grid">
         <button
           type="submit"
           class="btn btn-success"
-          [disabled]="!livroForm.valid || (loading$ | async)">
+          [disabled]="!livroForm.valid || (loading$ | async) || loadingCombos">
           @if (loading$ | async) {
             <span
               class="spinner-border spinner-border-sm me-2"
