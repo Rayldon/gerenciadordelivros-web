@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -14,12 +15,11 @@ import {
   selectLivroFirst,
   selectLivroLast,
 } from '../store/livro.selectors';
-import { LivroFormComponent } from './livro-form.component';
 
 @Component({
   selector: 'app-livro-list',
   standalone: true,
-  imports: [CommonModule, LivroFormComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './livro-list.component.html',
 })
 export class LivroListComponent implements OnInit {

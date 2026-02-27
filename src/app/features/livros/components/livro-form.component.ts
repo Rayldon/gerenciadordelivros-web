@@ -5,7 +5,6 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
-  FormArray,
 } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -30,7 +29,7 @@ export class LivroFormComponent {
   ) {
     this.livroForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(1)]],
-      valor: ['', [Validators.required, Validators.min(0)]],
+      valor: ['', [Validators.required]],
       autores: this.fb.array([this.fb.control('')]),
       assuntos: this.fb.array([this.fb.control('')]),
     });
@@ -77,7 +76,8 @@ export class LivroFormComponent {
 
   isValorInvalid(): boolean {
     const control = this.livroForm.get('valor');
-    return !!(control && control.invalid && control.touched);
+    const valor = this.parseCurrencyValue(control?.value);
+    return !!(control && control.touched && (control.invalid || valor === null));
   }
 
   isAutoresInvalid(): boolean {
@@ -98,6 +98,8 @@ export class LivroFormComponent {
 
   onSubmit(): void {
     if (!this.livroForm.valid) return;
+    const valor = this.parseCurrencyValue(this.livroForm.get('valor')?.value);
+    if (valor === null || valor < 0) return;
 
     const autoresArray = this.livroForm.get('autores') as any;
     const assuntosArray = this.livroForm.get('assuntos') as any;
@@ -109,7 +111,7 @@ export class LivroFormComponent {
 
     const livro: Livro = {
       titulo: this.livroForm.get('titulo')?.value,
-      valor: this.livroForm.get('valor')?.value,
+      valor,
       autores,
       assuntos,
     };
@@ -125,5 +127,36 @@ export class LivroFormComponent {
 
   clearError(): void {
     this.store.dispatch(LivroActions.clearError());
+  }
+
+  onValorInput(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+
+    const onlyDigits = input.value.replace(/\D/g, '');
+    const maskedValue = this.maskCurrencyValue(onlyDigits);
+
+    input.value = maskedValue;
+    this.livroForm.get('valor')?.setValue(maskedValue, { emitEvent: false });
+  }
+
+  private maskCurrencyValue(digits: string): string {
+    if (!digits) return '';
+
+    const numericValue = Number(digits) / 100;
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(numericValue);
+  }
+
+  private parseCurrencyValue(value: unknown): number | null {
+    const raw = String(value ?? '').trim();
+    if (!raw) return null;
+
+    const normalized = raw.replace(/\./g, '').replace(',', '.');
+    const parsed = Number(normalized);
+
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }

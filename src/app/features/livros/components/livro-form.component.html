@@ -32,11 +32,14 @@
       <div class="mb-3">
         <label for="valor" class="form-label">Valor (R$) *</label>
         <input
-          type="number"
+          type="text"
           class="form-control"
           id="valor"
           formControlName="valor"
-          step="0.01"
+          inputmode="decimal"
+          placeholder="0,00"
+          autocomplete="off"
+          (input)="onValorInput($event)"
           [class.is-invalid]="isValorInvalid()" />
         @if (isValorInvalid()) {
           <div class="invalid-feedback">

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { LivroService } from '../../../core/services/livro.service';
 import * as LivroActions from './livro.actions';
 
@@ -10,11 +10,12 @@ import * as LivroActions from './livro.actions';
 export class LivroEffects {
   readonly loadLivros$;
   readonly createLivro$;
+  readonly navigateAfterCreateSuccess$;
 
   constructor(
     private actions$: Actions,
     private livroService: LivroService,
-    private store: Store
+    private router: Router
   ) {
     this.loadLivros$ = createEffect(() =>
       this.actions$.pipe(
@@ -40,6 +41,17 @@ export class LivroEffects {
           )
         )
       )
+    );
+
+    this.navigateAfterCreateSuccess$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(LivroActions.createLivroSuccess),
+          tap(() => {
+            void this.router.navigate(['/livros']);
+          })
+        ),
+      { dispatch: false }
     );
   }
 
