@@ -33,4 +33,36 @@ export const createLivroError = createAction(
   props<{ error: ApiError }>()
 );
 
+export const updateLivro = createAction(
+  '[Livro] Update Livro',
+  props<{ id: number; livro: Livro }>()
+);
+
+export const updateLivroSuccess = createAction(
+  '[Livro] Update Livro Success',
+  props<{ id: number; livro: Livro }>()
+);
+
+export const updateLivroError = createAction(
+  '[Livro] Update Livro Error',
+  props<{ error: ApiError }>()
+);
+
+export const deleteLivro = createAction(
+  '[Livro] Delete Livro',
+  props<{ id: number }>()
+);
+
+export const deleteLivroSuccess = createAction(
+  '[Livro] Delete Livro Success',
+  props<{ id: number }>()
+);
+
+export const deleteLivroError = createAction(
+  '[Livro] Delete Livro Error',
+  props<{ error: ApiError }>()
+);
+
+export const clearSuccess = createAction('[Livro] Clear Success');
+
 export const clearError = createAction('[Livro] Clear Error');

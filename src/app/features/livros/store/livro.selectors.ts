@@ -7,12 +7,14 @@ export interface LivroState {
   pageResponse: PageResponse<Livro> | null;
   loading: boolean;
   error: any | null;
+  success: string | null;
 }
 
 export const initialState: LivroState = {
   pageResponse: null,
   loading: false,
   error: null,
+  success: null,
 };
 
 export const selectLivroState = createFeatureSelector<LivroState>('livros');
@@ -30,6 +32,11 @@ export const selectLivroLoading = createSelector(
 export const selectLivroError = createSelector(
   selectLivroState,
   (state: LivroState) => state.error
+);
+
+export const selectLivroSuccess = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.success
 );
 
 export const selectLivroPage = createSelector(

@@ -1,4 +1,6 @@
 export interface Livro {
+  id?: number;
+  codl?: number;
   titulo: string;
   valor: number;
   autores: string[];
