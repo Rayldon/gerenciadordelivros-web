@@ -1,0 +1,50 @@
+<div class="card">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">Criar Novo Assunto</h5>
+  </div>
+  <div class="card-body">
+    @if (error$ | async) {
+      <div class="alert alert-danger alert-dismissible fade show">
+        {{ (error$ | async)?.message }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="clearError()"></button>
+      </div>
+    }
+
+    <form [formGroup]="assuntoForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="descricao" class="form-label">Descrição *</label>
+        <input
+          type="text"
+          class="form-control"
+          id="descricao"
+          formControlName="descricao"
+          [class.is-invalid]="isDescricaoInvalid()" />
+        @if (isDescricaoInvalid()) {
+          <div class="invalid-feedback">
+            Descrição é obrigatória e não pode estar vazia
+          </div>
+        }
+      </div>
+
+      <div class="d-grid">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="!assuntoForm.valid || (loading$ | async)">
+          @if (loading$ | async) {
+            <span
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"></span>
+            Salvando...
+          } @else {
+            Salvar Assunto
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
