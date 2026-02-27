@@ -8,33 +8,39 @@ import * as LivroActions from './livro.actions';
 
 @Injectable()
 export class LivroEffects {
-  loadLivros$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LivroActions.loadLivros),
-      switchMap(() =>
-        this.livroService.getLivros().pipe(
-          map((livros) => LivroActions.loadLivrosSuccess({ livros })),
-          catchError((error) => of(LivroActions.loadLivrosError({ error })))
-        )
-      )
-    )
-  );
-
-  createLivro$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LivroActions.createLivro),
-      switchMap(({ livro }) =>
-        this.livroService.createLivro(livro).pipe(
-          map((livro) => LivroActions.createLivroSuccess({ livro })),
-          catchError((error) => of(LivroActions.createLivroError({ error })))
-        )
-      )
-    )
-  );
+  readonly loadLivros$;
+  readonly createLivro$;
 
   constructor(
     private actions$: Actions,
     private livroService: LivroService,
     private store: Store
-  ) {}
+  ) {
+    this.loadLivros$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(LivroActions.loadLivros),
+        switchMap(({ page = 0, size = 10 }) =>
+          this.livroService.getLivros(page, size).pipe(
+            map((pageResponse) =>
+              LivroActions.loadLivrosSuccess({ pageResponse })
+            ),
+            catchError((error) => of(LivroActions.loadLivrosError({ error })))
+          )
+        )
+      )
+    );
+
+    this.createLivro$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(LivroActions.createLivro),
+        switchMap(({ livro }) =>
+          this.livroService.createLivro(livro).pipe(
+            map((livro) => LivroActions.createLivroSuccess({ livro })),
+            catchError((error) => of(LivroActions.createLivroError({ error })))
+          )
+        )
+      )
+    );
+  }
+
 }

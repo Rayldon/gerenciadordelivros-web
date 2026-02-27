@@ -1,12 +1,16 @@
 import { createAction, props } from '@ngrx/store';
 import { Livro } from '../../../core/models';
 import { ApiError } from '../../../core/models';
+import { PageResponse } from '../../../core/models/page-response.model';
 
-export const loadLivros = createAction('[Livro] Load Livros');
+export const loadLivros = createAction(
+  '[Livro] Load Livros',
+  props<{ page?: number; size?: number }>()
+);
 
 export const loadLivrosSuccess = createAction(
   '[Livro] Load Livros Success',
-  props<{ livros: Livro[] }>()
+  props<{ pageResponse: import('../../../core/models/page-response.model').PageResponse<Livro> }>()
 );
 
 export const loadLivrosError = createAction(

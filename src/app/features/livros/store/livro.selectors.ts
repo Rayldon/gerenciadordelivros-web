@@ -1,13 +1,16 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 
+import { PageResponse } from '../../../core/models/page-response.model';
+import { Livro } from '../../../core/models';
+
 export interface LivroState {
-  livros: any[];
+  pageResponse: PageResponse<Livro> | null;
   loading: boolean;
   error: any | null;
 }
 
 export const initialState: LivroState = {
-  livros: [],
+  pageResponse: null,
   loading: false,
   error: null,
 };
@@ -16,7 +19,7 @@ export const selectLivroState = createFeatureSelector<LivroState>('livros');
 
 export const selectAllLivros = createSelector(
   selectLivroState,
-  (state: LivroState) => state.livros
+  (state: LivroState) => state.pageResponse?.content ?? []
 );
 
 export const selectLivroLoading = createSelector(
@@ -27,4 +30,34 @@ export const selectLivroLoading = createSelector(
 export const selectLivroError = createSelector(
   selectLivroState,
   (state: LivroState) => state.error
+);
+
+export const selectLivroPage = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.page ?? 0
+);
+
+export const selectLivroSize = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.size ?? 0
+);
+
+export const selectLivroTotalElements = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.totalElements ?? 0
+);
+
+export const selectLivroTotalPages = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.totalPages ?? 0
+);
+
+export const selectLivroFirst = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.first ?? false
+);
+
+export const selectLivroLast = createSelector(
+  selectLivroState,
+  (state: LivroState) => state.pageResponse?.last ?? false
 );
